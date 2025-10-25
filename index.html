@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>🎁 Instagram Giveaway</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Poppins', sans-serif;
+      background: url('https://images.unsplash.com/photo-1588000133538-48c0e8b73e8f?auto=format&fit=crop&w=1920&q=80') center/cover no-repeat;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      color: white;
+      text-shadow: 0 2px 6px rgba(0,0,0,0.7);
+      background-attachment: fixed;
+    }
+
+    h1 {
+      font-size: 3em;
+      margin-bottom: 10px;
+    }
+
+    .container {
+      background: rgba(0, 0, 0, 0.6);
+      padding: 30px;
+      border-radius: 20px;
+      text-align: center;
+      width: 90%;
+      max-width: 600px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+    }
+
+    input, select, button {
+      padding: 10px;
+      margin: 10px;
+      width: 80%;
+      border-radius: 10px;
+      border: none;
+      outline: none;
+      font-size: 1em;
+    }
+
+    button {
+      background: #ff0066;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      background: #ff3385;
+    }
+
+    .spinner {
+      display: none;
+      font-size: 1.5em;
+      margin-top: 10px;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .result {
+      margin-top: 20px;
+      font-size: 1.3em;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🎁 Instagram Giveaway</h1>
+    <p>Zadej URL příspěvku a podmínky soutěže:</p>
+
+    <input type="text" id="url" placeholder="Vlož URL příspěvku" />
+    <select id="rules">
+      <option value="like">👍 Musí dát like</option>
+      <option value="follow">👤 Musí sledovat účet</option>
+      <option value="comment">💬 Musí napsat komentář</option>
+      <option value="tag">🏷️ Musí označit kamaráda</option>
+      <option value="multi">🎯 Musí splnit všechny</option>
+    </select>
+
+    <button onclick="startDraw()">🎲 Spustit losování</button>
+
+    <div class="spinner" id="spinner">🔄</div>
+    <div class="result" id="result"></div>
+  </div>
+
+  <script>
+    async function startDraw() {
+      const url = document.getElementById('url').value;
+      const rules = document.getElementById('rules').value;
+      const spinner = document.getElementById('spinner');
+      const resultDiv = document.getElementById('result');
+      spinner.style.display = 'block';
+      resultDiv.textContent = '';
+
+      try {
+        const res = await fetch("https://ig-losovani-backend.onrender.com/draw", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            participants: ["user1", "user2", "user3", "user4"], // testovací data
+            rules: rules,
+            winners_count: 1
+          })
+        });
+        const data = await res.json();
+        spinner.style.display = 'none';
+        resultDiv.textContent = `🎉 Výherce: ${data.winners ? data.winners.join(", ") : "žádný"}`;
+      } catch (error) {
+        spinner.style.display = 'none';
+        resultDiv.textContent = "❌ Chyba při losování.";
+      }
+    }
+  </script>
+</body>
+</html>
